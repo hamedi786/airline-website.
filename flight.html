@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت پروازها | پنل کارکنان هواپیمایی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', 'Iran Sans', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #1e2a3e;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0b3b5f;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #ffb347;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            border-bottom-color: #ffb347;
+            color: #ffb347;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* هدر مدیریت */
+        .management-header {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .management-header h1 {
+            color: #0b3b5f;
+        }
+
+        .btn-add {
+            background: #ffb347;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-add:hover {
+            background: #ff9f1c;
+            transform: scale(1.02);
+        }
+
+        /* آمار سریع */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffb347;
+        }
+
+        .stat-label {
+            color: #4a627a;
+            margin-top: 0.5rem;
+        }
+
+        /* فیلترها */
+        .filters {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters input, .filters select {
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* جدول پروازها */
+        .flights-table-container {
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #0b3b5f;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .btn-edit, .btn-delete, .btn-seats {
+            padding: 6px 12px;
+            margin: 0 4px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .btn-edit {
+            background: #0b3b5f;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1e5a7d;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #b91c1c;
+        }
+
+        .btn-seats {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-seats:hover {
+            background: #059669;
+        }
+
+        .status-active {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        /* مودال افزودن/ویرایش پرواز */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            color: #0b3b5f;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #1e2a3e;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-save {
+            background: #ffb347;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-close {
+            background: #94a3b8;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* مودال مدیریت صندلی */
+        .seat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .seat-item {
+            background: #e2e8f0;
+            padding: 12px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .seat-item.occupied {
+            background: #dc2626;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .seat-item.available {
+            background: #10b981;
+            color: white;
+        }
+
+        .seat-item:hover:not(.occupied) {
+            transform: scale(1.05);
+            background: #ffb347;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        footer {
+            background: #0b3b5f;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">پرواز<span>بوک</span></div>
+        <ul class="nav-links">
+            <li><a href="home.html">خانه</a></li>
+            <li><a href="book.html">رزرو بلیط</a></li>
+            <li><a href="dashboard.html">داشبورد</a></li>
+            <li><a href="#" class="active">مدیریت پرواز</a></li>
+            <li><a href="admin.html">پنل ادمین</a></li>
+        </ul>
+    </div>
+</header>
+
+<div class="container">
+    <div class="management-header">
+        <h1>✈️ مدیریت برنامه پروازها</h1>
+        <button class="btn-add" onclick="openAddFlightModal()">➕ افزودن پرواز جدید</button>
+    </div>
+
+    <!-- آمار سریع -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="totalFlights">0</div>
+            <div class="stat-label">کل پروازها</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="activeFlights">0</div>
+            <div class="stat-label">پروازهای فعال</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalSeats">0</div>
+            <div class="stat-label">کل صندلی‌ها</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="occupiedSeats">0</div>
+            <div class="stat-label">صندلی‌های رزرو شده</div>
+        </div>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="filters">
+        <input type="text" id="filterOrigin" placeholder="مبدا..." onkeyup="filterFlights()">
+        <input type="text" id="filterDestination" placeholder="مقصد..." onkeyup="filterFlights()">
+        <select id="filterStatus" onchange="filterFlights()">
+            <option value="all">همه وضعیت‌ها</option>
+            <option value="active">فعال</option>
+            <option value="cancelled">لغو شده</option>
+        </select>
+        <button class="btn-add" style="background:#0b3b5f; color:white;" onclick="resetFilters()"> reset پاک کردن فیلترها</button>
+    </div>
+
+    <!-- جدول پروازها -->
+    <div class="flights-table-container">
+        <table id="flightsTable">
+            <thead>
+                <tr>
+                    <th>شماره پرواز</th>
+                    <th>مبدا</th>
+                    <th>مقصد</th>
+                    <th>تاریخ</th>
+                    <th>ساعت</th>
+                    <th>قیمت (تومان)</th>
+                    <th>کل صندلی</th>
+                    <th>صندلی خالی</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody id="flightsTableBody">
+                <!-- داده‌ها با جاوااسکریپت پر می‌شوند -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- مودال افزودن/ویرایش پرواز -->
+<div id="flightModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">➕ افزودن پرواز جدید</h3>
+        <input type="hidden" id="flightId">
+        <div class="form-group">
+            <label>شماره پرواز:</label>
+            <input type="text" id="flightNo" placeholder="مثال: IR721">
+        </div>
+        <div class="form-group">
+            <label>مبدا:</label>
+            <input type="text" id="origin" placeholder="تهران">
+        </div>
+        <div class="form-group">
+            <label>مقصد:</label>
+            <input type="text" id="destination" placeholder="مشهد">
+        </div>
+        <div class="form-group">
+            <label>تاریخ پرواز:</label>
+            <input type="date" id="date">
+        </div>
+        <div class="form-group">
+            <label>ساعت پرواز:</label>
+            <input type="time" id="time">
+        </div>
+        <div class="form-group">
+            <label>قیمت پایه (تومان):</label>
+            <input type="number" id="price" placeholder="850000">
+        </div>
+        <div class="form-group">
+            <label>کل صندلی‌ها:</label>
+            <input type="number" id="totalSeatsCount" placeholder="24" min="1" max="60">
+        </div>
+        <div class="form-group">
+            <label>وضعیت:</label>
+            <select id="status">
+                <option value="active">فعال</option>
+                <option value="cancelled">لغو شده</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-save" onclick="saveFlight()">💾 ذخیره</button>
+            <button class="btn-close" onclick="closeFlightModal()">انصراف</button>
+        </div>
+    </div>
+</div>
+
+<!-- مودال مدیریت صندلی‌ها -->
+<div id="seatsModal" class="modal">
+    <div class="modal-content">
+        <h3>🪑 مدیریت صندلی‌های پرواز</h3>
+        <p id="seatsFlightInfo"></p>
+        <div id="seatsMapContainer" class="seat-map-grid"></div>
+        <button class="btn-close" onclick="closeSeatsModal()">بستن</button>
+    </div>
+</div>
+
+<footer>
+    <p>سیستم ثبت بلیط هواپیما - مدیریت پروازها، CRUD کامل و مدیریت صندلی‌ها (قابلیت ایجاد، خواندن، به‌روزرسانی، حذف)</p>
+</footer>
+
+<script>
+    // دیتای نمونه پروازها با اطلاعات صندلی
+    let flights = [
+        {
+            id: 1,
+            flightNo: "IR721",
+            origin: "تهران",
+            destination: "مشهد",
+            date: "2026-04-20",
+            time: "08:00",
+            price: 850000,
+            totalSeats: 24,
+            bookedSeats: [3, 7, 12, 15],
+            status: "active"
+        },
+        {
+            id: 2,
+            flightNo: "IR452",
+            origin: "تهران",
+            destination: "شیراز",
+            date: "2026-04-25",
+            time: "10:30",
+            price: 1250000,
+            totalSeats: 30,
+            bookedSeats: [5, 8, 9, 14, 20],
+            status: "active"
+        },
+        {
+            id: 3,
+            flightNo: "IR893",
+            origin: "مشهد",
+            destination: "تهران",
+            date: "2026-04-18",
+            time: "14:15",
+            price: 920000,
+            totalSeats: 24,
+            bookedSeats: [1, 2, 3],
+            status: "active"
+        },
+        {
+            id: 4,
+            flightNo: "IR204",
+            origin: "اصفهان",
+            destination: "کیش",
+            date: "2026-05-01",
+            time: "16:45",
+            price: 2100000,
+            totalSeats: 36,
+            bookedSeats: [10, 11, 12, 13],
+            status: "cancelled"
+        }
+    ];
+
+    let nextId = 5;
+    let currentSeatsFlight = null;
+
+    function renderFlightsTable() {
+        const filterOrigin = document.getElementById('filterOrigin').value.toLowerCase();
+        const filterDest = document.getElementById('filterDestination').value.toLowerCase();
+        const filterStatus = document.getElementById('filterStatus').value;
+
+        let filtered = flights.filter(flight => {
+            const matchOrigin = flight.origin.toLowerCase().includes(filterOrigin);
+            const matchDest = flight.destination.toLowerCase().includes(filterDest);
+            const matchStatus = filterStatus === 'all' || flight.status === filterStatus;
+            return matchOrigin && matchDest && matchStatus;
+        });
+
+        const tbody = document.getElementById('flightsTableBody');
+        if(filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:2rem;">❌ هیچ پروازی یافت نشد</td></tr>';
+        } else {
+            tbody.innerHTML = filtered.map(flight => {
+                const availableSeats = flight.totalSeats - flight.bookedSeats.length;
+                return `
+                    <tr>
+                        <td>${flight.flightNo}</td>
+                        <td>${flight.origin}</td>
+                        <td>${flight.destination}</td>
+                        <td>${flight.date}</td>
+                        <td>${flight.time}</td>
+                        <td>${flight.price.toLocaleString()}</td>
+                        <td>${flight.totalSeats}</td>
+                        <td>${availableSeats}</td>
+                        <td class="${flight.status === 'active' ? 'status-active' : 'status-cancelled'}">${flight.status === 'active' ? 'فعال' : 'لغو شده'}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editFlight(${flight.id})">✏️ ویرایش</button>
+                            <button class="btn-delete" onclick="deleteFlight(${flight.id})">🗑️ حذف</button>
+                            <button class="btn-seats" onclick="manageSeats(${flight.id})">🪑 صندلی‌ها</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // به‌روزرسانی آمار
+        updateStats();
+    }
+
+    function updateStats() {
+        document.getElementById('totalFlights').innerText = flights.length;
+        document.getElementById('activeFlights').innerText = flights.filter(f => f.status === 'active').length;
+        const totalSeatsAll = flights.reduce((sum, f) => sum + f.totalSeats, 0);
+        const totalBooked = flights.reduce((sum, f) => sum + f.bookedSeats.length, 0);
+        document.getElementById('totalSeats').innerText = totalSeatsAll;
+        document.getElementById('occupiedSeats').innerText = totalBooked;
+    }
+
+    function filterFlights() {
+        renderFlightsTable();
+    }
+
+    function resetFilters() {
+        document.getElementById('filterOrigin').value = '';
+        document.getElementById('filterDestination').value = '';
+        document.getElementById('filterStatus').value = 'all';
+        renderFlightsTable();
+    }
+
+    function openAddFlightModal() {
+        document.getElementById('modalTitle').innerText = '➕ افزودن پرواز جدید';
+        document.getElementById('flightId').value = '';
+        document.getElementById('flightNo').value = '';
+        document.getElementById('origin').value = '';
+        document.getElementById('destination').value = '';
+        document.getElementById('date').value = '';
+        document.getElementById('time').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('totalSeatsCount').value = '24';
+        document.getElementById('status').value = 'active';
+        document.getElementById('flightModal').style.display = 'flex';
+    }
+
+    function editFlight(id) {
+        const flight = flights.find(f => f.id === id);
+        if(flight) {
+            document.getElementById('modalTitle').innerText = '✏️ ویرایش پرواز';
+            document.getElementById('flightId').value = flight.id;
+            document.getElementById('flightNo').value = flight.flightNo;
+            document.getElementById('origin').value = flight.origin;
+            document.getElementById('destination').value = flight.destination;
+            document.getElementById('date').value = flight.date;
+            document.getElementById('time').value = flight.time;
+            document.getElementById('price').value = flight.price;
+            document.getElementById('totalSeatsCount').value = flight.totalSeats;
+            document.getElementById('status').value = flight.status;
+            document.getElementById('flightModal').style.display = 'flex';
+        }
+    }
+
+    function saveFlight() {
+        const id = document.getElementById('flightId').value;
+        const flightNo = document.getElementById('flightNo').value;
+        const origin = document.getElementById('origin').value;
+        const destination = document.getElementById('destination').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        const price = parseInt(document.getElementById('price').value);
+        const totalSeats = parseInt(document.getElementById('totalSeatsCount').value);
+        const status = document.getElementById('status').value;
+
+        if(!flightNo || !origin || !destination || !date || !time || !price || !totalSeats) {
+            alert('لطفاً تمام فیلدها را پر کنید.');
+            return;
+        }
+
+        if(id) {
+            // ویرایش
+            const index = flights.findIndex(f => f.id === parseInt(id));
+            if(index !== -1) {
+                const oldBookedSeats = flights[index].bookedSeats;
+                flights[index] = {
+                    ...flights[index],
+                    flightNo, origin, destination, date, time, price, totalSeats, status,
+                    bookedSeats: oldBookedSeats.filter(seat => seat <= totalSeats)
+                };
+                alert('پرواز با موفقیت ویرایش شد.');
+            }
+        } else {
+            // افزودن جدید
+            const newFlight = {
+                id: nextId++,
+                flightNo, origin, destination, date, time, price, totalSeats,
+                bookedSeats: [],
+                status
+            };
+            flights.push(newFlight);
+            alert('پرواز جدید با موفقیت اضافه شد.');
+        }
+
+        closeFlightModal();
+        renderFlightsTable();
+    }
+
+    function deleteFlight(id) {
+        if(confirm('آیا از حذف این پرواز اطمینان دارید؟')) {
+            flights = flights.filter(f => f.id !== id);
+            renderFlightsTable();
+            alert('پرواز با موفقیت حذف شد.');
+        }
+    }
+
+    function closeFlightModal() {
+        document.getElementById('flightModal').style.display = 'none';
+    }
+
+    function manageSeats(id) {
+        const flight = flights.find(f => f.id === id);
+        if(flight) {
+            currentSeatsFlight = flight;
+            document.getElementById('seatsFlightInfo').innerHTML = `پرواز ${flight.flightNo} | ${flight.origin} → ${flight.destination}`;
+            renderSeatMap(flight);
+            document.getElementById('seatsModal').style.display = 'flex';
+        }
+    }
+
+    function renderSeatMap(flight) {
+        const container = document.getElementById('seatsMapContainer');
+        let seatsHtml = '';
+        for(let i = 1; i <= flight.totalSeats; i++) {
+            const isBooked = flight.bookedSeats.includes(i);
+            seatsHtml += `
+                <div class="seat-item ${isBooked ? 'occupied' : 'available'}" 
+                     onclick="${isBooked ? '' : `toggleSeat(${flight.id}, ${i})`}">
+                    ${i}
+                    ${isBooked ? '🔒' : '🟢'}
+                </div>
+            `;
+        }
+        container.innerHTML = seatsHtml;
+    }
+
+    function toggleSeat(flightId, seatNum) {
+        const flight = flights.find(f => f.id === flightId);
+        if(flight) {
+            if(flight.bookedSeats.includes(seatNum)) {
+                flight.bookedSeats = flight.bookedSeats.filter(s => s !== seatNum);
+                alert(`صندلی ${seatNum} با موفقیت خالی شد (رزرو لغو شد).`);
+            } else {
+                flight.bookedSeats.push(seatNum);
+                alert(`صندلی ${seatNum} به عنوان رزرو شده ثبت شد.`);
+            }
+            renderSeatMap(flight);
+            renderFlightsTable();
+        }
+    }
+
+    function closeSeatsModal() {
+        document.getElementById('seatsModal').style.display = 'none';
+        currentSeatsFlight = null;
+    }
+
+    // بارگذاری اولیه
+    window.onload = () => {
+        renderFlightsTable();
+    };
+</script>
+</body>
+</html>
