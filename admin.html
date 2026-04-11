@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت | ادمین سیستم رزرو بلیط</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', 'Iran Sans', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #1e2a3e;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0b3b5f;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #ffb347;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            border-bottom-color: #ffb347;
+            color: #ffb347;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* هدر ادمین */
+        .admin-header {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .admin-info h1 {
+            color: #0b3b5f;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-badge {
+            background: #dc2626;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+
+        /* کارت‌های آماری پیشرفته */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card-admin {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+
+        .stat-card-admin:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffb347;
+        }
+
+        /* تب‌های مدیریت */
+        .admin-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .admin-tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #4a627a;
+            transition: 0.3s;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .admin-tab.active {
+            color: #ffb347;
+            background: white;
+            border-bottom: 3px solid #ffb347;
+        }
+
+        .tab-pane {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* جداول */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th {
+            background: #0b3b5f;
+            color: white;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            margin: 0 4px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-edit-user {
+            background: #ffb347;
+            color: #1e2a3e;
+        }
+
+        .btn-delete-user {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-role {
+            background: #10b981;
+            color: white;
+        }
+
+        /* فرم‌ها */
+        .form-admin {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 16px;
+        }
+
+        .form-admin input, .form-admin select {
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* گزارشات */
+        .report-section {
+            margin-top: 1rem;
+        }
+
+        .report-item {
+            background: #f8fafc;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* مودال */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .data-table {
+                font-size: 0.8rem;
+            }
+        }
+
+        footer {
+            background: #0b3b5f;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">پرواز<span>بوک</span></div>
+        <ul class="nav-links">
+            <li><a href="home.html">خانه</a></li>
+            <li><a href="book.html">رزرو بلیط</a></li>
+            <li><a href="dashboard.html">داشبورد</a></li>
+            <li><a href="flight.html">مدیریت پرواز</a></li>
+            <li><a href="#" class="active">پنل ادمین</a></li>
+        </ul>
+    </div>
+</header>
+
+<div class="container">
+    <div class="admin-header">
+        <div class="admin-info">
+            <h1>👑 پنل مدیریت سیستم</h1>
+            <p>مدیریت کاربران، نظارت بر تراکنش‌ها و گزارش‌گیری پیشرفته</p>
+        </div>
+        <div class="admin-badge">
+            🔐 دسترسی سطح ادمین | مدیر سیستم
+        </div>
+    </div>
+
+    <!-- کارت‌های آماری پیشرفته -->
+    <div class="stats-dashboard" id="statsDashboard">
+        <div class="stat-card-admin">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="totalUsers">0</div>
+            <div>کل کاربران سیستم</div>
+        </div>
+        <div class="stat-card-admin">
+            <div class="stat-icon">✈️</div>
+            <div class="stat-value" id="totalFlightsAdmin">0</div>
+            <div>کل پروازها</div>
+        </div>
+        <div class="stat-card-admin">
+            <div class="stat-icon">🎫</div>
+            <div class="stat-value" id="totalBookingsAdmin">0</div>
+            <div>کل رزروها</div>
+        </div>
+        <div class="stat-card-admin">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value" id="totalRevenue">0</div>
+            <div>درآمد کل (تومان)</div>
+        </div>
+    </div>
+
+    <!-- تب‌های مدیریت -->
+    <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('users')">👥 مدیریت کاربران</button>
+        <button class="admin-tab" onclick="switchAdminTab('reports')">📊 گزارشات و آمار</button>
+        <button class="admin-tab" onclick="switchAdminTab('transactions')">💳 تراکنش‌ها</button>
+        <button class="admin-tab" onclick="switchAdminTab('system')">⚙️ کنترل سیستم</button>
+    </div>
+
+    <!-- تب مدیریت کاربران -->
+    <div id="usersTab" class="tab-pane active">
+        <h3 style="margin-bottom: 1rem;">➕ افزودن کاربر جدید</h3>
+        <div class="form-admin">
+            <input type="text" id="newUserName" placeholder="نام کامل">
+            <input type="email" id="newUserEmail" placeholder="ایمیل">
+            <input type="text" id="newUserPass" placeholder="رمز عبور">
+            <select id="newUserRole">
+                <option value="passenger">مسافر</option>
+                <option value="staff">کارمند هواپیمایی</option>
+                <option value="admin">ادمین</option>
+            </select>
+            <button class="btn-action btn-edit-user" onclick="addUser()">➕ افزودن کاربر</button>
+        </div>
+
+        <h3 style="margin: 1.5rem 0 1rem 0;">📋 لیست کاربران سیستم</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>نام کاربری</th>
+                    <th>ایمیل</th>
+                    <th>نقش</th>
+                    <th>تاریخ عضویت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- تب گزارشات -->
+    <div id="reportsTab" class="tab-pane">
+        <h3>📈 گزارشات فروش و اشغال پرواز</h3>
+        <div class="report-section" id="reportsContainer"></div>
+        <button class="btn-action btn-role" onclick="generateReport()" style="margin-top: 1rem;">📥 دریافت گزارش جدید</button>
+    </div>
+
+    <!-- تب تراکنش‌ها -->
+    <div id="transactionsTab" class="tab-pane">
+        <h3>💳 تاریخچه تراکنش‌های مالی</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>شماره تراکنش</th>
+                    <th>کاربر</th>
+                    <th>پرواز</th>
+                    <th>مبلغ (تومان)</th>
+                    <th>تاریخ پرداخت</th>
+                    <th>وضعیت</th>
+                </tr>
+            </thead>
+            <tbody id="transactionsTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- تب کنترل سیستم -->
+    <div id="systemTab" class="tab-pane">
+        <h3>⚙️ تنظیمات و کنترل سیستم</h3>
+        <div class="report-section">
+            <div class="report-item">
+                <span>🔐 وضعیت امنیت سیستم:</span>
+                <span style="color:#10b981;">✓ فعال (HTTPS, رمزنگاری داده‌ها)</span>
+            </div>
+            <div class="report-item">
+                <span>📊 آخرین پشتیبان‌گیری:</span>
+                <span>۱۴۰۵/۰۱/۱۵ - ساعت ۰۲:۰۰</span>
+                <button class="btn-action btn-role" onclick="backupSystem()">💾 پشتیبان‌گیری الان</button>
+            </div>
+            <div class="report-item">
+                <span>🕒 در دسترس بودن سیستم (Uptime):</span>
+                <span style="color:#10b981;">۹۹.۹۵% (طی ۳۰ روز گذشته)</span>
+            </div>
+            <div class="report-item">
+                <span>📧 تنظیمات اطلاع‌رسانی:</span>
+                <button class="btn-action btn-edit-user" onclick="toggleNotifications()">⚙️ مدیریت هشدارها</button>
+            </div>
+            <div class="report-item">
+                <span>🗑️ پاکسازی داده‌های قدیمی:</span>
+                <button class="btn-action btn-delete-user" onclick="cleanOldData()">پاک کردن رزروهای بیش از ۱ سال</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>سیستم ثبت بلیط هواپیما - پنل مدیریت جامع | کنترل کاربران، گزارشات، تراکنش‌ها و امنیت سیستم</p>
+</footer>
+
+<script>
+    // داده‌های نمونه - کاربران
+    let users = [
+        { id: 1, username: "rezakarimi", email: "reza@example.com", role: "passenger", joinDate: "1404/10/12" },
+        { id: 2, username: "saraahmadi", email: "sara@example.com", role: "passenger", joinDate: "1404/11/05" },
+        { id: 3, username: "ali.mohammadi", email: "ali@airline.com", role: "staff", joinDate: "1404/09/20" },
+        { id: 4, username: "admin_system", email: "admin@system.com", role: "admin", joinDate: "1404/08/01" }
+    ];
+
+    // داده‌های نمونه - رزروها (برای محاسبه درآمد)
+    let allBookings = [
+        { id: 1, userId: 1, flightNo: "IR721", amount: 850000, date: "1405/01/20", status: "paid" },
+        { id: 2, userId: 1, flightNo: "IR452", amount: 1250000, date: "1405/01/25", status: "paid" },
+        { id: 3, userId: 2, flightNo: "IR893", amount: 920000, date: "1405/01/18", status: "paid" },
+        { id: 4, userId: 2, flightNo: "IR204", amount: 2100000, date: "1405/02/01", status: "paid" },
+        { id: 5, userId: 3, flightNo: "IR721", amount: 850000, date: "1405/01/22", status: "cancelled" }
+    ];
+
+    // داده‌های نمونه - تراکنش‌ها
+    let transactions = [
+        { id: "TXN1001", user: "رضا کریمی", flight: "IR721", amount: 850000, date: "1405/01/15", status: "موفق" },
+        { id: "TXN1002", user: "سارا احمدی", flight: "IR893", amount: 920000, date: "1405/01/14", status: "موفق" },
+        { id: "TXN1003", user: "رضا کریمی", flight: "IR452", amount: 1250000, date: "1405/01/20", status: "موفق" },
+        { id: "TXN1004", user: "علی محمدی", flight: "IR721", amount: 850000, date: "1405/01/18", status: "لغو شده" }
+    ];
+
+    let nextUserId = 5;
+
+    function updateAdminStats() {
+        document.getElementById('totalUsers').innerText = users.length;
+        document.getElementById('totalFlightsAdmin').innerText = flights ? flights.length : 4;
+        document.getElementById('totalBookingsAdmin').innerText = allBookings.filter(b => b.status === 'paid').length;
+        const revenue = allBookings.filter(b => b.status === 'paid').reduce((sum, b) => sum + b.amount, 0);
+        document.getElementById('totalRevenue').innerText = revenue.toLocaleString();
+    }
+
+    function renderUsersTable() {
+        const tbody = document.getElementById('usersTableBody');
+        tbody.innerHTML = users.map(user => `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.email}</td>
+                <td>${user.role === 'passenger' ? 'مسافر' : user.role === 'staff' ? 'کارمند' : 'ادمین'}</td>
+                <td>${user.joinDate}</td>
+                <td>
+                    <button class="btn-action btn-edit-user" onclick="editUserRole(${user.id})">✏️ تغییر نقش</button>
+                    <button class="btn-action btn-delete-user" onclick="deleteUser(${user.id})">🗑️ حذف</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function addUser() {
+        const name = document.getElementById('newUserName').value;
+        const email = document.getElementById('newUserEmail').value;
+        const pass = document.getElementById('newUserPass').value;
+        const role = document.getElementById('newUserRole').value;
+
+        if(!name || !email || !pass) {
+            alert('لطفاً تمام فیلدها را پر کنید.');
+            return;
+        }
+
+        const newUser = {
+            id: nextUserId++,
+            username: name,
+            email: email,
+            role: role,
+            joinDate: new Date().toLocaleDateString('fa-IR')
+        };
+        users.push(newUser);
+        renderUsersTable();
+        updateAdminStats();
+        alert(`کاربر ${name} با موفقیت اضافه شد.`);
+        
+        // پاک کردن فرم
+        document.getElementById('newUserName').value = '';
+        document.getElementById('newUserEmail').value = '';
+        document.getElementById('newUserPass').value = '';
+    }
+
+    function editUserRole(id) {
+        const newRole = prompt('نقش جدید را وارد کنید:\n passenger (مسافر)\n staff (کارمند)\n admin (ادمین)');
+        if(newRole && ['passenger', 'staff', 'admin'].includes(newRole)) {
+            const user = users.find(u => u.id === id);
+            if(user) {
+                user.role = newRole;
+                renderUsersTable();
+                alert(`نقش کاربر ${user.username} به ${newRole} تغییر کرد.`);
+            }
+        } else if(newRole) {
+            alert('نقش نامعتبر است.');
+        }
+    }
+
+    function deleteUser(id) {
+        if(confirm('آیا از حذف این کاربر اطمینان دارید؟')) {
+            users = users.filter(u => u.id !== id);
+            renderUsersTable();
+            updateAdminStats();
+            alert('کاربر با موفقیت حذف شد.');
+        }
+    }
+
+    function generateReport() {
+        const reportContainer = document.getElementById('reportsContainer');
+        const totalFlights = flights ? flights.length : 4;
+        const activeFlightsCount = flights ? flights.filter(f => f.status === 'active').length : 3;
+        const totalBookedSeats = flights ? flights.reduce((sum, f) => sum + f.bookedSeats.length, 0) : 0;
+        const totalSeatsAll = flights ? flights.reduce((sum, f) => sum + f.totalSeats, 0) : 120;
+        const occupancyRate = ((totalBookedSeats / totalSeatsAll) * 100).toFixed(1);
+        
+        reportContainer.innerHTML = `
+            <div class="report-item">
+                <span>✈️ تعداد کل پروازها:</span>
+                <strong>${totalFlights}</strong>
+            </div>
+            <div class="report-item">
+                <span>✅ پروازهای فعال:</span>
+                <strong>${activeFlightsCount}</strong>
+            </div>
+            <div class="report-item">
+                <span>🪑 صندلی‌های رزرو شده:</span>
+                <strong>${totalBookedSeats}</strong>
+            </div>
+            <div class="report-item">
+                <span>📊 درصد اشغال پروازها:</span>
+                <strong>${occupancyRate}%</strong>
+            </div>
+            <div class="report-item">
+                <span>💰 درآمد کل (تومان):</span>
+                <strong>${allBookings.filter(b => b.status === 'paid').reduce((sum, b) => sum + b.amount, 0).toLocaleString()}</strong>
+            </div>
+            <div class="report-item">
+                <span>👥 تعداد کاربران فعال:</span>
+                <strong>${users.length}</strong>
+            </div>
+        `;
+    }
+
+    function renderTransactions() {
+        const tbody = document.getElementById('transactionsTableBody');
+        tbody.innerHTML = transactions.map(t => `
+            <tr>
+                <td>${t.id}</td>
+                <td>${t.user}</td>
+                <td>${t.flight}</td>
+                <td>${t.amount.toLocaleString()}</td>
+                <td>${t.date}</td>
+                <td style="color: ${t.status === 'موفق' ? '#10b981' : '#dc2626'}">${t.status}</td>
+            </tr>
+        `).join('');
+    }
+
+    function backupSystem() {
+        alert('✅ پشتیبان‌گیری از سیستم با موفقیت انجام شد.\nتمام داده‌های کاربران، پروازها و رزروها ذخیره شدند.');
+    }
+
+    function toggleNotifications() {
+        alert('⚙️ تنظیمات هشدارها:\n- ایمیل یادآوری پرواز: فعال\n- پیامک چک‌این: فعال\n- اعلان تغییر وضعیت پرواز: فعال');
+    }
+
+    function cleanOldData() {
+        if(confirm('آیا از پاک کردن رزروهای بیش از ۱ سال اطمینان دارید؟ این عمل قابل بازگشت نیست.')) {
+            alert('✅ داده‌های قدیمی با موفقیت پاکسازی شدند.');
+        }
+    }
+
+    function switchAdminTab(tabName) {
+        // تغییر کلاس تب‌ها
+        document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // مخفی کردن همه تب‌ها
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        
+        // نمایش تب انتخاب شده
+        if(tabName === 'users') {
+            document.getElementById('usersTab').classList.add('active');
+            renderUsersTable();
+        } else if(tabName === 'reports') {
+            document.getElementById('reportsTab').classList.add('active');
+            generateReport();
+        } else if(tabName === 'transactions') {
+            document.getElementById('transactionsTab').classList.add('active');
+            renderTransactions();
+        } else if(tabName === 'system') {
+            document.getElementById('systemTab').classList.add('active');
+        }
+    }
+
+    // بارگذاری اولیه
+    window.onload = () => {
+        updateAdminStats();
+        renderUsersTable();
+        generateReport();
+        renderTransactions();
+    };
+</script>
+</body>
+</html>

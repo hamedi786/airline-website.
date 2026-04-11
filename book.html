@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رزرو بلیط هواپیما | جستجو و رزرو پرواز</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', 'Iran Sans', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #1e2a3e;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0b3b5f;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #ffb347;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            border-bottom-color: #ffb347;
+            color: #ffb347;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* فرم جستجوی پیشرفته */
+        .search-advanced {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .search-advanced h2 {
+            color: #0b3b5f;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input, select, button {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffb347;
+            box-shadow: 0 0 0 2px rgba(255,180,71,0.2);
+        }
+
+        .btn-primary {
+            background: #ffb347;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #ff9f1c;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: #0b3b5f;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #1e5a7d;
+        }
+
+        /* لیست پروازهای موجود */
+        .flight-list {
+            margin: 2rem 0;
+        }
+
+        .flight-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-right: 4px solid #ffb347;
+        }
+
+        .flight-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transform: translateX(-5px);
+        }
+
+        .flight-info {
+            flex: 2;
+        }
+
+        .flight-route {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0b3b5f;
+            margin-bottom: 0.5rem;
+        }
+
+        .flight-details {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: #4a627a;
+        }
+
+        .flight-price {
+            text-align: left;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffb347;
+        }
+
+        .select-seat-btn {
+            background: #0b3b5f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .select-seat-btn:hover {
+            background: #ffb347;
+            color: #1e2a3e;
+        }
+
+        /* مودال انتخاب صندلی */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .seat-map {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .seat {
+            background: #e2e8f0;
+            padding: 12px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .seat.available:hover {
+            background: #ffb347;
+            transform: scale(1.05);
+        }
+
+        .seat.selected {
+            background: #0b3b5f;
+            color: white;
+        }
+
+        .seat.booked {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .close-modal {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* اطلاعات مسافر */
+        .passenger-form {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .passenger-form h3 {
+            color: #0b3b5f;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .flight-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            .flight-price {
+                text-align: center;
+            }
+        }
+
+        footer {
+            background: #0b3b5f;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">پرواز<span>بوک</span></div>
+        <ul class="nav-links">
+            <li><a href="home.html">خانه</a></li>
+            <li><a href="#" class="active">رزرو بلیط</a></li>
+            <li><a href="dashboard.html">داشبورد</a></li>
+            <li><a href="flight.html">مدیریت پرواز</a></li>
+            <li><a href="admin.html">پنل ادمین</a></li>
+        </ul>
+    </div>
+</header>
+
+<div class="container">
+    <!-- فرم جستجوی پیشرفته -->
+    <div class="search-advanced">
+        <h2>✈️ جستجوی پروازهای موجود</h2>
+        <div class="form-grid">
+            <input type="text" id="origin" placeholder="مبدا (مثلاً تهران)" value="تهران">
+            <input type="text" id="destination" placeholder="مقصد (مثلاً مشهد)" value="مشهد">
+            <input type="date" id="flightDate" value="2026-04-15">
+            <select id="classType">
+                <option>اقتصادی</option>
+                <option>بیزینس</option>
+                <option>فرست کلاس</option>
+            </select>
+        </div>
+        <div class="form-grid">
+            <input type="number" id="passengers" placeholder="تعداد مسافر" value="1" min="1" max="9">
+            <button class="btn-primary" onclick="searchFlights()">جستجوی پروازها</button>
+        </div>
+    </div>
+
+    <!-- لیست پروازها -->
+    <div class="flight-list" id="flightList">
+        <h3 style="margin-bottom: 1rem; color: #0b3b5f;">✈️ پروازهای موجود</h3>
+        <div id="flightsContainer">
+            <!-- پروازهای نمونه به صورت استاتیک -->
+        </div>
+    </div>
+
+    <!-- فرم اطلاعات مسافر (پنهان در ابتدا) -->
+    <div class="passenger-form" id="passengerForm">
+        <h3>👤 اطلاعات مسافر و پرداخت</h3>
+        <div class="form-grid">
+            <input type="text" placeholder="نام و نام خانوادگی" id="fullName">
+            <input type="text" placeholder="شماره گذرنامه/کد ملی" id="passport">
+            <input type="tel" placeholder="شماره تماس" id="phone">
+            <input type="email" placeholder="ایمیل" id="email">
+        </div>
+        <div class="form-grid">
+            <select id="paymentMethod">
+                <option>کارت اعتباری</option>
+                <option>پی پال (نمونه)</option>
+                <option>کارت بانکی</option>
+            </select>
+            <button class="btn-primary" onclick="processPayment()">پرداخت و تایید نهایی</button>
+        </div>
+        <p style="font-size: 0.85rem; margin-top: 12px; color: #6c7a89;">🔒 تمامی تراکنش‌ها امن و رمزنگاری شده هستند</p>
+    </div>
+</div>
+
+<!-- مودال نقشه صندلی -->
+<div id="seatModal" class="modal">
+    <div class="modal-content">
+        <h3>🪑 انتخاب صندلی پرواز</h3>
+        <p>شماره پرواز: <strong id="selectedFlightNo">IR712</strong></p>
+        <div class="seat-map" id="seatMap">
+            <!-- صندلی‌ها با جاوااسکریپت ساخته می‌شوند -->
+        </div>
+        <button class="btn-secondary" onclick="confirmSeat()">تایید صندلی</button>
+        <button class="close-modal" onclick="closeSeatModal()">بستن</button>
+    </div>
+</div>
+
+<footer>
+    <p>سیستم ثبت بلیط هواپیما - رزرو آنلاین با انتخاب صندلی تعاملی | طبق استاندارد ISO/IEC/IEEE 29148</p>
+</footer>
+
+<script>
+    // دیتای نمونه پروازها
+    let flights = [
+        { id: 1, flightNo: "IR721", origin: "تهران", destination: "مشهد", date: "2026-04-15", time: "08:00", price: 850000, availableSeats: 12 },
+        { id: 2, flightNo: "IR452", origin: "تهران", destination: "شیراز", date: "2026-04-15", time: "10:30", price: 1250000, availableSeats: 8 },
+        { id: 3, flightNo: "IR893", origin: "مشهد", destination: "تهران", date: "2026-04-16", time: "14:15", price: 920000, availableSeats: 5 },
+        { id: 4, flightNo: "IR204", origin: "اصفهان", destination: "کیش", date: "2026-04-15", time: "16:45", price: 2100000, availableSeats: 3 }
+    ];
+
+    let currentFlight = null;
+    let selectedSeat = null;
+
+    function searchFlights() {
+        let origin = document.getElementById('origin').value;
+        let destination = document.getElementById('destination').value;
+        let date = document.getElementById('flightDate').value;
+
+        let filtered = flights.filter(f => f.origin.includes(origin) && f.destination.includes(destination) && f.date === date);
+        
+        const container = document.getElementById('flightsContainer');
+        if(filtered.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:2rem;">❌ پروازی با این مشخصات یافت نشد.</p>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(flight => `
+            <div class="flight-card">
+                <div class="flight-info">
+                    <div class="flight-route">${flight.origin} ✈️ ${flight.destination}</div>
+                    <div class="flight-details">
+                        <span>🆔 شماره پرواز: ${flight.flightNo}</span>
+                        <span>⏰ ساعت: ${flight.time}</span>
+                        <span>📅 تاریخ: ${flight.date}</span>
+                        <span>🪑 صندلی خالی: ${flight.availableSeats}</span>
+                    </div>
+                </div>
+                <div class="flight-price">
+                    ${flight.price.toLocaleString()} تومان
+                    <button class="select-seat-btn" onclick="openSeatModal(${flight.id})">انتخاب صندلی</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openSeatModal(flightId) {
+        currentFlight = flights.find(f => f.id === flightId);
+        if(!currentFlight) return;
+        document.getElementById('selectedFlightNo').innerText = currentFlight.flightNo;
+        generateSeatMap();
+        document.getElementById('seatModal').style.display = 'flex';
+    }
+
+    function generateSeatMap() {
+        const seatMapDiv = document.getElementById('seatMap');
+        // ساخت 24 صندلی (6x4)
+        let seatsHtml = '';
+        for(let i = 1; i <= 24; i++) {
+            let status = 'available';
+            // شبیه‌سازی چند صندلی پر شده
+            if([3,7,12,18].includes(i)) status = 'booked';
+            seatsHtml += `<div class="seat ${status}" data-seat="${i}" onclick="selectSeat(${i}, '${status}')">${i}</div>`;
+        }
+        seatMapDiv.innerHTML = seatsHtml;
+    }
+
+    function selectSeat(seatNum, status) {
+        if(status === 'booked') {
+            alert('این صندلی قبلاً رزرو شده است.');
+            return;
+        }
+        // حذف انتخاب قبلی
+        document.querySelectorAll('.seat').forEach(seat => seat.classList.remove('selected'));
+        let seatDiv = document.querySelector(`.seat[data-seat='${seatNum}']`);
+        seatDiv.classList.add('selected');
+        selectedSeat = seatNum;
+    }
+
+    function confirmSeat() {
+        if(!selectedSeat) {
+            alert('لطفاً یک صندلی را انتخاب کنید.');
+            return;
+        }
+        alert(`صندلی شماره ${selectedSeat} با موفقیت انتخاب شد. اکنون اطلاعات مسافر را تکمیل کنید.`);
+        closeSeatModal();
+        document.getElementById('passengerForm').style.display = 'block';
+        // اسکرول به فرم مسافر
+        document.getElementById('passengerForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeSeatModal() {
+        document.getElementById('seatModal').style.display = 'none';
+        selectedSeat = null;
+    }
+
+    function processPayment() {
+        let name = document.getElementById('fullName').value;
+        let passport = document.getElementById('passport').value;
+        let phone = document.getElementById('phone').value;
+        let email = document.getElementById('email').value;
+
+        if(!name || !passport || !phone || !email) {
+            alert('لطفاً تمام اطلاعات مسافر را وارد کنید.');
+            return;
+        }
+        if(!selectedSeat && currentFlight) {
+            alert('ابتدا صندلی خود را انتخاب کنید.');
+            return;
+        }
+
+        alert(`✅ رزرو شما با موفقیت ثبت شد!\n\nشماره پرواز: ${currentFlight.flightNo}\nصندلی: ${selectedSeat}\nمسافر: ${name}\nایمیل تأیید برای ${email} ارسال شد.`);
+        // ریست فرم
+        document.getElementById('passengerForm').style.display = 'none';
+        document.getElementById('fullName').value = '';
+        document.getElementById('passport').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('email').value = '';
+        selectedSeat = null;
+    }
+
+    // بارگذاری اولیه پروازها
+    window.onload = () => {
+        searchFlights();
+    };
+</script>
+</body>
+</html> 
