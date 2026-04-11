@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد کاربر | رزروهای من</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', 'Iran Sans', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #1e2a3e;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0b3b5f;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #ffb347;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            border-bottom-color: #ffb347;
+            color: #ffb347;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* پروفایل کاربر */
+        .profile-header {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .user-info h2 {
+            color: #0b3b5f;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info p {
+            color: #4a627a;
+        }
+
+        .badge {
+            background: #ffb347;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #1e2a3e;
+        }
+
+        /* تب‌ها */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #cbd5e1;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #4a627a;
+            transition: 0.3s;
+        }
+
+        .tab.active {
+            color: #ffb347;
+            border-bottom: 3px solid #ffb347;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* کارت رزرو */
+        .booking-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-right: 4px solid #ffb347;
+            transition: 0.2s;
+        }
+
+        .booking-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .flight-code {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0b3b5f;
+        }
+
+        .status {
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .status.confirmed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4a627a;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-cancel {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #b91c1c;
+        }
+
+        .btn-change {
+            background: #0b3b5f;
+            color: white;
+        }
+
+        .btn-change:hover {
+            background: #1e5a7d;
+        }
+
+        .btn-checkin {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-checkin:hover {
+            background: #059669;
+        }
+
+        /* کارت پرواز دیجیتال */
+        .boarding-pass {
+            background: linear-gradient(135deg, #0b3b5f, #1e5a7d);
+            color: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .boarding-pass.show {
+            display: block;
+        }
+
+        .qr-placeholder {
+            background: white;
+            color: black;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 12px;
+            margin: 1rem 0;
+            font-family: monospace;
+        }
+
+        /* مودال تغییر رزرو */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content select, .modal-content input {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+        }
+
+        footer {
+            background: #0b3b5f;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">پرواز<span>بوک</span></div>
+        <ul class="nav-links">
+            <li><a href="home.html">خانه</a></li>
+            <li><a href="book.html">رزرو بلیط</a></li>
+            <li><a href="#" class="active">داشبورد</a></li>
+            <li><a href="flight.html">مدیریت پرواز</a></li>
+            <li><a href="admin.html">پنل ادمین</a></li>
+        </ul>
+    </div>
+</header>
+
+<div class="container">
+    <!-- هدر پروفایل -->
+    <div class="profile-header">
+        <div class="user-info">
+            <h2>👋 خوش آمدید، رضا کریمی</h2>
+            <p>شماره عضویت: #IR123456 | ایمیل: reza.karimi@example.com</p>
+        </div>
+        <div class="badge">
+            ✈️ مسافر نقره‌ای | ۱۲ پرواز
+        </div>
+    </div>
+
+    <!-- تب‌ها -->
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('active')">رزروهای فعال</button>
+        <button class="tab" onclick="switchTab('history')">تاریخچه سفرها</button>
+        <button class="tab" onclick="switchTab('checkin')">چک‌این آنلاین</button>
+    </div>
+
+    <!-- تب رزروهای فعال -->
+    <div id="activeTab" class="tab-content active">
+        <div id="activeBookings"></div>
+    </div>
+
+    <!-- تب تاریخچه -->
+    <div id="historyTab" class="tab-content">
+        <div id="historyBookings"></div>
+    </div>
+
+    <!-- تب چک‌این آنلاین -->
+    <div id="checkinTab" class="tab-content">
+        <div id="checkinList"></div>
+    </div>
+</div>
+
+<!-- مودال تغییر رزرو -->
+<div id="changeModal" class="modal">
+    <div class="modal-content">
+        <h3>✏️ تغییر رزرو</h3>
+        <p id="changeFlightInfo"></p>
+        <label>تاریخ جدید:</label>
+        <input type="date" id="newDate">
+        <label>کلاس جدید:</label>
+        <select id="newClass">
+            <option>اقتصادی</option>
+            <option>بیزینس</option>
+            <option>فرست کلاس</option>
+        </select>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button class="btn-sm btn-change" onclick="confirmChange()">تایید تغییر</button>
+            <button class="btn-sm btn-cancel" onclick="closeChangeModal()">انصراف</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>سیستم ثبت بلیط هواپیما - مدیریت رزروها، چک‌این آنلاین و کارت پرواز دیجیتال</p>
+</footer>
+
+<script>
+    // دیتای نمونه رزروها
+    let bookings = [
+        {
+            id: 1,
+            flightNo: "IR721",
+            origin: "تهران",
+            destination: "مشهد",
+            date: "2026-04-20",
+            time: "08:00",
+            seat: "12A",
+            price: 850000,
+            status: "confirmed",
+            passengerName: "رضا کریمی",
+            passport: "A12345678",
+            checkedIn: false
+        },
+        {
+            id: 2,
+            flightNo: "IR452",
+            origin: "تهران",
+            destination: "شیراز",
+            date: "2026-04-25",
+            time: "10:30",
+            seat: "5B",
+            price: 1250000,
+            status: "confirmed",
+            passengerName: "رضا کریمی",
+            passport: "A12345678",
+            checkedIn: false
+        },
+        {
+            id: 3,
+            flightNo: "IR893",
+            origin: "مشهد",
+            destination: "تهران",
+            date: "2026-03-15",
+            time: "14:15",
+            seat: "8C",
+            price: 920000,
+            status: "cancelled",
+            passengerName: "رضا کریمی",
+            passport: "A12345678",
+            checkedIn: false
+        },
+        {
+            id: 4,
+            flightNo: "IR204",
+            origin: "اصفهان",
+            destination: "کیش",
+            date: "2026-02-10",
+            time: "16:45",
+            seat: "3F",
+            price: 2100000,
+            status: "confirmed",
+            passengerName: "رضا کریمی",
+            passport: "A12345678",
+            checkedIn: true
+        }
+    ];
+
+    let changeBookingId = null;
+
+    function renderActiveBookings() {
+        const active = bookings.filter(b => b.status === 'confirmed' && new Date(b.date) >= new Date());
+        const container = document.getElementById('activeBookings');
+        if(active.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:2rem;">❌ هیچ رزرو فعالی وجود ندارد.</p>';
+            return;
+        }
+        container.innerHTML = active.map(booking => `
+            <div class="booking-card">
+                <div class="booking-header">
+                    <span class="flight-code">✈️ پرواز ${booking.flightNo} | ${booking.origin} → ${booking.destination}</span>
+                    <span class="status confirmed">تأیید شده</span>
+                </div>
+                <div class="booking-details">
+                    <div class="detail-item">📅 تاریخ: ${booking.date}</div>
+                    <div class="detail-item">⏰ ساعت: ${booking.time}</div>
+                    <div class="detail-item">🪑 صندلی: ${booking.seat}</div>
+                    <div class="detail-item">💰 قیمت: ${booking.price.toLocaleString()} تومان</div>
+                </div>
+                <div class="booking-actions">
+                    <button class="btn-sm btn-cancel" onclick="cancelBooking(${booking.id})">لغو رزرو</button>
+                    <button class="btn-sm btn-change" onclick="openChangeModal(${booking.id})">تغییر تاریخ/کلاس</button>
+                    ${!booking.checkedIn ? `<button class="btn-sm btn-checkin" onclick="checkInOnline(${booking.id})">✅ چک‌این آنلاین</button>` : '<span class="badge" style="background:#10b981;">✓ چک‌این شده</span>'}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderHistory() {
+        const history = bookings.filter(b => new Date(b.date) < new Date() || b.status === 'cancelled');
+        const container = document.getElementById('historyBookings');
+        if(history.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:2rem;">📭 هیچ سفر گذشته‌ای ندارید.</p>';
+            return;
+        }
+        container.innerHTML = history.map(booking => `
+            <div class="booking-card">
+                <div class="booking-header">
+                    <span class="flight-code">✈️ پرواز ${booking.flightNo} | ${booking.origin} → ${booking.destination}</span>
+                    <span class="status ${booking.status === 'cancelled' ? 'cancelled' : 'confirmed'}">${booking.status === 'cancelled' ? 'لغو شده' : 'انجام شده'}</span>
+                </div>
+                <div class="booking-details">
+                    <div class="detail-item">📅 تاریخ: ${booking.date}</div>
+                    <div class="detail-item">⏰ ساعت: ${booking.time}</div>
+                    <div class="detail-item">🪑 صندلی: ${booking.seat}</div>
+                    <div class="detail-item">💰 قیمت: ${booking.price.toLocaleString()} تومان</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderCheckinList() {
+        const upcoming = bookings.filter(b => b.status === 'confirmed' && new Date(b.date) >= new Date() && !b.checkedIn);
+        const container = document.getElementById('checkinList');
+        if(upcoming.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:2rem;">🎉 همه رزروهای شما چک‌این شده‌اند یا پروازی برای چک‌این وجود ندارد.</p>';
+            return;
+        }
+        container.innerHTML = upcoming.map(booking => `
+            <div class="booking-card">
+                <div class="booking-header">
+                    <span class="flight-code">✈️ پرواز ${booking.flightNo} | ${booking.origin} → ${booking.destination}</span>
+                    <span class="status pending">در انتظار چک‌این</span>
+                </div>
+                <div class="booking-details">
+                    <div class="detail-item">📅 تاریخ: ${booking.date}</div>
+                    <div class="detail-item">⏰ ساعت: ${booking.time}</div>
+                    <div class="detail-item">🪑 صندلی: ${booking.seat}</div>
+                </div>
+                <button class="btn-sm btn-checkin" onclick="checkInOnline(${booking.id})">✈️ انجام چک‌این آنلاین</button>
+            </div>
+        `).join('');
+    }
+
+    function cancelBooking(id) {
+        if(confirm('آیا از لغو این رزرو اطمینان دارید؟')) {
+            const booking = bookings.find(b => b.id === id);
+            if(booking) {
+                booking.status = 'cancelled';
+                alert(`رزرو پرواز ${booking.flightNo} با موفقیت لغو شد.`);
+                renderActiveBookings();
+                renderHistory();
+                renderCheckinList();
+            }
+        }
+    }
+
+    function openChangeModal(id) {
+        const booking = bookings.find(b => b.id === id);
+        if(booking) {
+            changeBookingId = id;
+            document.getElementById('changeFlightInfo').innerHTML = `پرواز ${booking.flightNo} | ${booking.origin} → ${booking.destination}`;
+            document.getElementById('newDate').value = booking.date;
+            document.getElementById('changeModal').style.display = 'flex';
+        }
+    }
+
+    function confirmChange() {
+        const newDate = document.getElementById('newDate').value;
+        const newClass = document.getElementById('newClass').value;
+        if(!newDate) {
+            alert('لطفاً تاریخ جدید را انتخاب کنید.');
+            return;
+        }
+        const booking = bookings.find(b => b.id === changeBookingId);
+        if(booking) {
+            booking.date = newDate;
+            alert(`رزرو پرواز ${booking.flightNo} با موفقیت به تاریخ ${newDate} و کلاس ${newClass} تغییر یافت.\n(هزینه نهایی مجدد محاسبه خواهد شد)`);
+            closeChangeModal();
+            renderActiveBookings();
+            renderCheckinList();
+        }
+    }
+
+    function closeChangeModal() {
+        document.getElementById('changeModal').style.display = 'none';
+        changeBookingId = null;
+    }
+
+    function checkInOnline(id) {
+        const booking = bookings.find(b => b.id === id);
+        if(booking) {
+            if(booking.checkedIn) {
+                alert('شما قبلاً برای این پرواز چک‌این کرده‌اید.');
+                return;
+            }
+            // انتخاب صندلی جدید در چک‌این
+            const newSeat = prompt(`چک‌این آنلاین برای پرواز ${booking.flightNo}\nصندلی فعلی: ${booking.seat}\nشماره صندلی جدید را وارد کنید (مثلاً 14C):`, booking.seat);
+            if(newSeat) {
+                booking.checkedIn = true;
+                booking.seat = newSeat;
+                alert(`✅ چک‌این با موفقیت انجام شد!\nصندلی جدید: ${booking.seat}\nکارت پرواز دیجیتال برای شما صادر شد.`);
+                
+                // نمایش کارت پرواز
+                showBoardingPass(booking);
+                renderActiveBookings();
+                renderCheckinList();
+            }
+        }
+    }
+
+    function showBoardingPass(booking) {
+        // ساخت یک کارت پرواز موقت در صفحه
+        const passDiv = document.createElement('div');
+        passDiv.className = 'boarding-pass show';
+        passDiv.innerHTML = `
+            <h3>🎫 کارت پرواز دیجیتال</h3>
+            <p><strong>${booking.flightNo}</strong> | ${booking.origin} → ${booking.destination}</p>
+            <p>مسافر: ${booking.passengerName}</p>
+            <p>تاریخ: ${booking.date} | ساعت: ${booking.time}</p>
+            <p>صندلی: ${booking.seat} | دروازه: G${Math.floor(Math.random() * 20) + 1}</p>
+            <div class="qr-placeholder">
+                📱 [QR Code نمونه] کد رزرو: ${booking.id}${booking.flightNo}
+            </div>
+            <button class="btn-sm btn-change" onclick="this.parentElement.remove()">بستن کارت پرواز</button>
+        `;
+        document.querySelector('.container').appendChild(passDiv);
+        setTimeout(() => {
+            passDiv.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }
+
+    function switchTab(tabName) {
+        // تغییر کلاس فعال تب‌ها
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // مخفی کردن همه تب‌ها
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // نمایش تب انتخاب شده
+        if(tabName === 'active') {
+            document.getElementById('activeTab').classList.add('active');
+            renderActiveBookings();
+        } else if(tabName === 'history') {
+            document.getElementById('historyTab').classList.add('active');
+            renderHistory();
+        } else if(tabName === 'checkin') {
+            document.getElementById('checkinTab').classList.add('active');
+            renderCheckinList();
+        }
+    }
+
+    // بارگذاری اولیه
+    window.onload = () => {
+        renderActiveBookings();
+        renderHistory();
+        renderCheckinList();
+    };
+</script>
+</body>
+</html>
